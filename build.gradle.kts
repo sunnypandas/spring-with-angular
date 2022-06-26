@@ -1,37 +1,21 @@
-buildscript {
-    repositories {
-        mavenCentral()
-        gradlePluginPortal()
-    }
-    dependencies {
-        classpath "gradle.plugin.com.github.johnrengelman:shadow:7.1.2"
-    }
-}
-
 plugins {
-    id 'org.springframework.boot' version '2.7.1'
-    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-    id 'com.github.johnrengelman.shadow' version '7.1.2'
-    id 'java'
+    id("org.springframework.boot") version "2.7.1"
+    id("io.spring.dependency-management") version "1.0.11.RELEASE"
+    id("java")
+    application
 }
 
-group = 'com.citi'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '11'
+group = "com.citi"
+version = "0.0.1-SNAPSHOT"
 
-jar {
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
+val jar by tasks.getting(Jar::class) {
     manifest {
-        attributes "Main-Class": "com.citi.abbr.SpringWithAngularApplication"
-    }
-
-    from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-}
-
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
+        attributes["Main-Class"] = "com.citi.abbr.SpringWithAngularApplication"
     }
 }
 
@@ -40,36 +24,37 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    compileOnly 'org.projectlombok:lombok'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation(project(":ui"))
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    compileOnly("org.projectlombok:lombok")
+    developmentOnly("org.springframework.boot:spring-boot-devtools")
+    annotationProcessor("org.projectlombok:lombok")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
-tasks.named('test') {
-    useJUnitPlatform()
+tasks.named("bootJar") {
+    finalizedBy("deleteDist")
 }
 
-task deleteDist(type:Delete) {
-    if (file('dist').exists()) {
-        delete file('dist')
+tasks.register<Delete>("deleteDist") {
+    finalizedBy("prepareDist")
+    if (file("dist").exists()) {
+        delete(file("dist"))
     }
 }
 
-task prepareDist {
-    mustRunAfter build
-    doLast {
-        mkdir "dist"
-    }
+tasks.register("prepareDist") {
+    finalizedBy("copyLibs")
+    mkdir("dist")
 }
 
-task copyLibs(type: Copy) {
-    from 'build/libs'
-    into 'dist'
+tasks.register<Copy>("copyLibs") {
+    finalizedBy("copyShells")
+    from("build/libs")
+    into("dist")
 }
 
-task copyShells(type: Copy) {
-    from 'bin'
-    into 'dist'
+tasks.register<Copy>("copyShells") {
+    from("bin")
+    into("dist")
 }

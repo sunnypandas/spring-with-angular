@@ -1,2 +1,2 @@
-rootProject.name = 'spring-with-angular'
+rootProject.name = "spring-with-angular"
 include("ui")
