@@ -32,7 +32,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
-tasks.named("bootJar") {
+tasks.named("build") {
     finalizedBy("deleteDist")
 }
 
