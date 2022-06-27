@@ -46,6 +46,6 @@ sourceSets {
   }
 }
 
-tasks.test {
-  dependsOn(lintTask, testTask)
-}
+//tasks.test {
+//  dependsOn(lintTask, testTask)
+//}
